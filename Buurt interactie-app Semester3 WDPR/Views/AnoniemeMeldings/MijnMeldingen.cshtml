@@ -1,0 +1,45 @@
+﻿@using Buurt_interactie_app_Semester3_WDPR.ViewModel
+@model GepagineerdeLijst<Buurt_interactie_app_Semester3_WDPR.Models.AnoniemeMelding>
+
+@{
+    ViewData["Title"] = "Mijn anonieme meldingen";
+}
+
+<h1>Mijn anonieme meldingen</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-dark">Nieuwe anonieme melding</a>
+</p>
+
+<div id="content" class="row mx-0">
+    <div id="meldingen" class="col-md-8 px-0">
+        <div id="melding-container" class="px-0">
+            @foreach (var meld in Model)
+            {
+                <div id="voorbeeldmelding" class="card">
+                    <div class="row justify-content-between p-1" id="meld">
+                        <div class="col-lg-10 col-md-7 text-primary card-body" style="overflow-wrap: break-word">
+                            <h5 class="card-title"><strong>@meld.Titel</strong></h5>
+                            <h6 class="card-subtitle"><strong>Categorie: </strong>@meld.CategorieNaam</h6>
+                            <h7 class="text-muted">@meld.Tijdstip.ToShortDateString() @meld.Tijdstip.ToShortTimeString()</h7>
+                            <h8 class="card-text"><p class="text-info">[inhoud verborgen]</p></h8>
+                        </div>
+                        <div class="col-lg-2 col-md-5">
+                            <a class="btn btn-danger" asp-action="Delete" asp-route-id="@meld.Id">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+        <div id="melding-nav">
+            <button type="button" class="btn btn-light" value="@((int)ViewData["Pagina"] - 1)" onclick="pagineer(this);" @(Model.HeeftVorige() ? "" : "disabled='disabled'")>←</button><button onclick="pagineer(this);" type="button" value="@((int)ViewData["Pagina"] + 1)" class="btn btn-light" @(Model.HeeftVolgende() ? "" : "disabled='disabled'")>→</button>
+             <a asp-area="Identity" asp-page="/Account/Manage/Index">Terug naar profiel</a>
+        </div>
+    </div>
+    
+    </div>
+    <form method="get" id="formPagina">
+        <input type="hidden" value="@ViewData["Pagina"]" />
+    </form>
+</div>

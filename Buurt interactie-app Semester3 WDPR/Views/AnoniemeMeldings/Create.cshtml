@@ -1,0 +1,65 @@
+﻿@model Buurt_interactie_app_Semester3_WDPR.Models.AnoniemeMelding
+
+@{
+    ViewData["Title"] = "Anonieme melding maken";
+}
+@section MeldingenCSS{
+    <link rel="stylesheet" href="~/css/Meldingen.css" />
+}
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+<div class=".container-fluid">
+    <div class="row">
+        <div class="container col-md-8 float-left" style="margin-top: 30px">
+            <div class="card bg-secondary shadow">
+                <form asp-action="Create" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="Open" value="true" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="card-header bg-white border-0">
+                        <div class="row align-items-center">
+                            <div class="col-10">
+                                <span asp-validation-for="Titel" class="text-danger"></span>
+                                <textarea asp-for="Titel" style="font-size:18px;width:100%;"></textarea>
+                            </div>
+                            <div class="col-2 text-right">
+                                <button type="submit" class="btn btn-primary">Post</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body ">
+                        <div class="row align-items-center">
+                            <div class="col-8">
+                                <label asp-for="CategorieNaam" class="control-label"></label>
+                                <select asp-for="CategorieNaam" class="form-control" asp-items="ViewBag.CategorieNaam"></select>
+                            </div>
+                            <div class="col-4 text-right">
+                            </div>
+                        </div>
+                        <hr class="my-1">
+
+                        <div>
+                            <span asp-validation-for="Tekst" class="text-danger"></span>
+                            <textarea class="form-control" asp-for="Tekst" rows="10" placeholder="Geef hier je melding op"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleFormControlFile1">Afbeelding invoegen</label>
+                            <input id="fileInput" asp-for="Afbeelding" class="form-control-file" accept=".png, .jpg, .jpeg">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+    var uploadField = document.getElementById("fileInput");
+
+    uploadField.onchange = function () {
+        if (this.files[0].size > 2097152) {
+            alert("File is too big!");
+            this.value = "";
+        };
+    };
+    </script>
+} 

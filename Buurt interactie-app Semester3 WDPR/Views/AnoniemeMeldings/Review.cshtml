@@ -1,0 +1,35 @@
+﻿@using Buurt_interactie_app_Semester3_WDPR.ViewModel
+@model GepagineerdeLijst<Buurt_interactie_app_Semester3_WDPR.Models.AnoniemeMelding>
+
+@{
+    ViewData["Title"] = "Anonieme meldingen";
+}
+
+<h1>Anonieme Meldingen</h1>
+<div id="content" class="row mx-0">
+    <div id="meldingen" class="col-md-8 px-0">
+        <div id="melding-container" class="px-0">
+            @foreach (var meld in Model)
+            {
+                <div id="voorbeeldmelding" class="card">
+                    <div class="row justify-content-between p-1" id="meld">
+                        <div class="col-10 text-primary card-body" style="overflow-wrap: break-word">
+                            <h5 class="card-title"><strong>@meld.Titel</strong></h5>
+                            <h6 class="card-subtitle"><strong>Categorie: </strong>@meld.CategorieNaam</h6>
+                            <h7 class="text-muted">@meld.Tijdstip.ToShortDateString() @meld.Tijdstip.ToShortTimeString()</h7>
+                            <h8 class="card-text"><p class="text-info">[inhoud verborgen]</p></h8>
+                        </div>
+                        <div class="col-2">
+                            <a class="btn btn-outline-dark" asp-action="Details" asp-route-id="@meld.Id">Details</a>
+                            <a class="btn btn-danger" asp-action="Delete" asp-route-id="@meld.Id">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+        </div>
+    <form method="get" id="formPagina">
+        <input id="pageInput" type="hidden" value="@ViewData["Pagina"]" />
+    </form>
+</div>

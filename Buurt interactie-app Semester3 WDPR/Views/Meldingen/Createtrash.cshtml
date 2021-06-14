@@ -1,0 +1,51 @@
+﻿@model Buurt_interactie_app_Semester3_WDPR.Models.Melding
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Melding</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Tijdstip" value="@DateTime.Now" />
+            <input type="hidden" asp-for="Open" value="true" />
+            <div class="form-group">
+                <label asp-for="Titel" class="control-label"></label>
+                <input asp-for="Titel" class="form-control" />
+                <span asp-validation-for="Titel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Tekst" class="control-label"></label>
+                <input asp-for="Tekst" class="form-control" />
+                <span asp-validation-for="Tekst" class="text-danger"></span>
+            </div>
+            <!-- latere implementatie
+        <div class="form-group">
+        <label asp-for="Afbeelding" class="control-label"></label>
+        <input type="file" asp-for="Afbeelding" class="form-control" />
+        <span asp-validation-for="Afbeelding" class="text-danger"></span>
+    </div>
+        -->
+            <div class="form-group">
+                <label asp-for="CategorieNaam" class="control-label"></label>
+                <select asp-for="CategorieNaam" class="form-control" asp-items="ViewBag.CategorieNaam"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Terug naar overzicht</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

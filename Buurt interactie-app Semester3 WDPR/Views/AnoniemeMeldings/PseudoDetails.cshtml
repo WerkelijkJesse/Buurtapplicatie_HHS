@@ -1,0 +1,35 @@
+﻿@model Buurt_interactie_app_Semester3_WDPR.Models.BuurtbewonerAno
+
+@{
+    ViewData["Title"] = "Anonieme gebruiker details";
+}
+
+<h1>View</h1>
+
+<div>
+    <h4>Anonieme gebruiker</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            <strong>Pseudoniem</strong>
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.SudoId)
+        </dd>
+        <dt class="col-sm-2">
+            <strong>Anoniem ID</strong>
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AnoId);
+        </dd>
+        <dt class="col-sm-2">
+            <strong>Username</strong>
+        </dt>
+        <dd class="col-sm-10">
+            @ViewData["gebr"];
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Pseudo">Terug naar overzicht</a>
+</div>

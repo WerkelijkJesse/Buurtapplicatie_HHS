@@ -1,0 +1,95 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Profiel";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h4>@ViewData["Title"]</h4>
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="main-content">
+    <div class="jumbotron card card-image" style="background-image: url(https://mdbootstrap.com/img/Photos/Others/gradient1.jpg);">
+        <div class="container-fluid d-flex align-items-center">
+            <div class="row">
+                <div class="col-lg-12 col-md-10">
+                    <h1 class="display-2 text-white">
+                    Hallo @Model.Naam
+                    </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Page content -->
+    <div class=".container-fluid">
+        <div class="row">
+            <div class="container col-md-8 float-left">
+                <div class="card bg-secondary shadow">
+                    <div class="card-header bg-white border-0">
+                        <div class="row align-items-center">
+                            <div class="col-8">
+                                <h3 class="mb-0">Mijn account</h3>
+                            </div>
+                            <div class="col-4 text-right">
+                                <a href="#!" class="btn btn-sm btn-primary">Instellingen</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body ">
+                        <form>
+                            <h6 class="heading-small mb-4 text-white">Gebruikers informatie</h6>
+                            <div class="pl-lg-4">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="Username" class="text-white">Email</label>
+                                            <input asp-for="Username" class="form-control" disabled />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label asp-for="Naam" class="text-white"></label>
+                                            <input asp-for="Naam" class="form-control" disabled />
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <hr class="my-4">
+                            <!-- Address -->
+                            <h6 class="heading-small text-white mb-4">Contact informatie</h6>
+                            <div class="pl-lg-4">
+                                
+                                <div class="row">
+                                    <div class="col-lg-4">
+                                        <div class="form-group focused">
+                                            <label class="form-control-label text-white" for="input-city">Plaats</label>
+                                            <label type="text" id="input-city" class="form-control form-control-alternative" placeholder="City" value="Den haag">Den Haag</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group">
+                                            <label asp-for="Postcode" class="text-white"></label>
+                                            <input asp-for="Postcode" class="form-control" disabled />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <a id="delete" asp-page="DeletePersonalData" class="btn btn-primary" style="margin-bottom: 5px" alt="Verwijder Account Knop">Verwijder account</a>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,44 @@
+﻿@model Buurt_interactie_app_Semester3_WDPR.ViewModel.GepagineerdeLijst<Buurt_interactie_app_Semester3_WDPR.Models.BuurtbewonerAno>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<Buurt_interactie_app_Semester3_WDPR.Areas.Identity.Data.BuurtAppUser> UserManager
+
+@{
+    ViewData["Title"] = "Anonieme gebruikers";
+}
+
+<h1>Anonieme gebruikers</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <strong>Pseudoniem</strong>
+            </th>
+            <th>
+                <strong>Anoniem ID</strong>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SudoId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AnoId)
+                </td>
+                <td>
+                    <!--
+                    <form asp-action="PseudoDetails" method="post">
+                        <input type="hidden" name="id" value="anoid..." />
+                        <button type="submit" class="btn btn-danger" asp-action="PseudoDetails">Details</button>
+                    </form> -->
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,38 @@
+@using Microsoft.AspNetCore.Identity
+@using Buurt_interactie_app_Semester3_WDPR.Areas.Identity.Data
+@inject UserManager<BuurtAppUser> UserManager
+@model Buurt_interactie_app_Semester3_WDPR.Models.AnoniemeMelding
+@{
+    ViewData["Title"] = "Melding";
+}
+<div id="pag-title"><h3>Anonieme Melding details</h3></div>
+
+<link rel="stylesheet" href="/css/Details.css" />
+<div id="content" class="row justify-content-between">
+    <div id="details" class="col-lg-6 px-0">
+        <div id="melding-header" class="border">
+            <div id="melding-titel" class="py-3 px-2 border" style="overflow-wrap: break-word"><span><h3>@Html.DisplayFor(model => model.Titel)</h3></span></div>
+            <div id="melding-data" class="row nomargin py-2 border">
+                <div id="melding-categorie" class="col-6">
+                    <span><strong>Categorie: </strong>@Html.DisplayFor(model => model.CategorieNaam)<br /> <strong>Door: </strong>[verborgen]</span>
+                </div>
+                <div id="melding-timedate" class="col-6 text-right">
+                    <span class="align-self-end"> @Model.Tijdstip.ToShortTimeString()<br />@Model.Tijdstip.Date.ToShortDateString()</span>
+                </div>
+            </div>
+        </div>
+        <div id="melding-body" class="row nomargin border">
+            <div id="melding-content" class="col-12 py-2" style="overflow-wrap: break-word"><span>@Html.DisplayFor(model => model.Tekst)</span></div>
+            <div id="melding-afb" class="col-12 py-2">
+                @if (Model.AfbeeldingURL != null)
+                {
+
+                    <img class="img-responsive center-block" src="~/uploads/@Model.AfbeeldingURL" alt="Melding afbeelding" />
+                }
+            </div>
+        </div>
+        <div>
+            <a asp-action="Review">Terug naar overzicht</a>
+        </div>
+    </div>
+</div>

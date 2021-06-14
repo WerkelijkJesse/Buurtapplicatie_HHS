@@ -1,0 +1,193 @@
+﻿@using Buurt_interactie_app_Semester3_WDPR.ViewModel
+@using Microsoft.AspNetCore.Identity
+@model Buurt_interactie_app_Semester3_WDPR.ViewModel.GepagineerdeLijst<Buurt_interactie_app_Semester3_WDPR.Models.Melding>
+@inject UserManager<Buurt_interactie_app_Semester3_WDPR.Areas.Identity.Data.BuurtAppUser> UserManager 
+@{
+    ViewData["Title"] = "Overzicht";
+}
+@section OverzichtCSS {
+
+    <link rel="stylesheet" href="/css/Overzicht.css" />
+}
+<div id="pag-title" class="row justify-content-between">
+    <div class="col-md-5 col-12"><h3>@ViewData["Title"]</h3></div>
+    @if ((await UserManager.GetRolesAsync((await UserManager.GetUserAsync(User)))).Contains("Default") && !(await UserManager.GetRolesAsync((await UserManager.GetUserAsync(User)))).Contains("Moderator") && !(await UserManager.GetRolesAsync((await UserManager.GetUserAsync(User)))).Contains("Administrator"))
+    {
+        <div class="col-md-3 col-6"><a asp-action="Create" class="btn btn-outline-dark">Nieuwe melding</a></div>
+        <div class="col-md-4 col-6"><a asp-action="Create" asp-controller="AnoniemeMeldings" class="btn btn-dark">Anonieme melding</a></div>
+    }
+</div>
+<div id="content" class="row px-0">
+    <div id="filters" class="col-md-5 row">
+        <div id="filters-sort" class="col-md-5">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="sortButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Sorteer op
+                </button>
+                <div class="dropdown-menu" aria-labelledby="sortButton">
+                    @{
+                        Filter filter = (Filter)ViewData["Filter"];
+                        <a class="dropdown-item" id="sortNieuwste" onclick="sort(this);">Nieuwste</a>
+                        <a class="dropdown-item" id="sortOudste" onclick="sort(this);">Oudste</a>
+                        <a class="dropdown-item" id="sortLikes" onclick="sort(this);">Meeste Likes</a>
+                        <a class="dropdown-item" id="sortViews" onclick="sort(this);">Meeste Views</a>
+                        <a class="dropdown-item" id="sortABC" onclick="sort(this);">Alfabetisch (A-Z)</a>
+                    }
+                </div>
+            </div>
+        </div>
+        <div id="filters-filters" class="col-md-7">
+            <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#filterBox" aria-expanded="false" aria-controls="filterBox">Filters</button>
+            <div class="collapse" id="filterBox">
+                <form method="get" asp-action="MijnMeldingen">
+                    @{
+                        Filter f = (Filter)ViewData["Filter"];
+                        DateRange date = f.Range;
+
+                        if (f.Gesloten)
+                        {
+                            <div id="likebox">
+                                <input class="form-check-input" type="checkbox" id="geslotenCheck" checked="checked" />
+                                <label class="form-check-label" for="geslotenCheck">
+                                    Gesloten
+                                </label>
+                            </div>
+                        }
+                        else
+                        {
+                            <div id="likebox">
+                                <input class="form-check-input" type="checkbox" id="geslotenCheck" />
+                                <label class="form-check-label" for="geslotenCheck">
+                                    Gesloten
+                                </label>
+                            </div>
+                        }
+                        <label class="control-label" for="Date">Van</label>
+                        <div>
+                            <input type="date" class="form-Date" id="fromDate" name="from" value="@date.Start.ToString("yyyy'-'MM'-'dd")" max="@DateTime.Today.ToString("yyyy'-'MM'-'dd")" min="@(new DateTime(2021, 1, 1).ToString("yyyy'-'MM'-'dd"))" />
+                        </div><br />
+                        <label class="control-label" for="Date">Tot en met</label>
+                        <div>
+                            <input type="date" class="form-Date" id="toDate" name="to" value="@date.Eind.ToString("yyyy'-'MM'-'dd")" max="@DateTime.Today.ToString("yyyy'-'MM'-'dd")" min="@(new DateTime(2021, 1, 1).ToString("yyyy'-'MM'-'dd"))">
+                        </div>
+
+                        <div>
+                            <textarea class="form-control" id="zoektext" placeholder="Zoek..."></textarea>
+                        </div>
+
+                        <button type="button" class="btn btn-outline-dark" onclick="sendGet()">Zoek</button>
+                    }
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="meldingen" class="col-md-7 px-0">
+        <div id="melding-container" class="px-0">
+            @foreach (var meld in Model)
+            {
+                    <div id="voorbeeldmelding" class="card">
+                        <div class="row justify-content-between p-1" id="meld">
+                            <a class="col-lg-10 col-8" asp-action="Details" asp-route-id="@meld.Id">
+                                <div class="text-primary card-body pr-0" id="meldingInhoud" style="overflow-wrap: break-word">
+                                    <h5 class="card-title"><strong>@meld.Titel</strong></h5>
+                                    <h9 class="card-subtitle text-muted mb-2">@meld.Buurtbewoner.UserName</h9>
+                                    <h8 class="card-text"><p class="text-info">@meld.Tekst</p></h8>
+                                </div>
+                            </a>
+                                <div class="col-lg-2 col-4" style="text-align:right">
+                                    <div class="text-secondary">
+                                        @meld.AantalViews.Count() Views
+                                    </div>
+                                    <div class="text-secondary">
+                                        @meld.Likes.Count() Likes
+                                    </div>
+                                    <div class="">
+                                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@meld.Id">Verwijder</a>
+                                        <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@meld.Id">Bewerk</a>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+            }
+
+        </div>
+        <form asp-action="MijnMeldingen" method="get" id="formPagina">
+            <input id="sortInput" type="hidden" name="sort" value="@ViewData["Sort"]" />
+            @{
+                Filter fi = (Filter)ViewData["Filter"];
+                DateRange vantot = fi.Range;
+                <input id="likedInput" type="hidden" name="likes" value="@fi.Geliket" />
+                <input id="closedInput" type="hidden" name="closed" value="@fi.Gesloten" />
+                <input id="fromInput" type="hidden" name="from" value="@vantot.Start" />
+                <input id="toInput" type="hidden" name="to" value="@vantot.Eind" />
+                <input id="pageInput" type="hidden" name="pagina" value="@((int)ViewData["Pagina"])" />
+                <input id="zoekInput" type="hidden" name="zoek" value="@fi.Zoekterm" />
+            }
+        </form>
+        <div id="melding-nav"><button type="button" class="btn btn-light" value="@((int)ViewData["Pagina"] - 1)" onclick="pagineer(this);" @(Model.HeeftVorige() ? "" : "disabled='disabled'")>←</button><button onclick="pagineer(this);" type="button" value="@((int)ViewData["Pagina"] + 1)" class="btn btn-light" @(Model.HeeftVolgende() ? "" : "disabled='disabled'")>→</button>
+         <a asp-area="Identity" asp-page="/Account/Manage/Index">Terug naar profiel</a></div>
+    </div>
+</div>
+
+<form asp-action="MijnMeldingen" method="get" id="formResetPagina">
+    <input id="sortInputReset" type="hidden" name="sort" value="@ViewData["Sort"]" />
+    @{
+        Filter fil = (Filter)ViewData["Filter"];
+        DateRange datum = fil.Range;
+        <input id="likedInputReset" type="hidden" name="likes" value="@fil.Geliket" />
+        <input id="closedInputReset" type="hidden" name="closed" value="@fil.Gesloten" />
+        <input id="fromInputReset" type="hidden" name="from" value="@datum.Start" />
+        <input id="toInputReset" type="hidden" name="to" value="@datum.Eind" />
+        <input id="zoekInputReset" type="hidden" name="zoek" value="@fil.Zoekterm" />
+        <input type="hidden" name="pagina" value="0" />
+    }
+</form>
+
+@section Scripts
+{
+    <script>
+        function sort(selectObj) {
+            var val = selectObj.value;
+            var sortInput = document.getElementById("sortInputReset");
+
+            sortInput.value = val;
+            if (selectObj.id == "sortOudste") {
+                sortInput.value = "oudste";
+            }
+            else if (selectObj.id == "sortNieuwste") {
+                sortInput.value = "nieuwste";
+            }
+            else if (selectObj.id == "sortLikes") {
+                sortInput.value = "meestelikes";
+            }
+            else if (selectObj.id == "sortABC") {
+                sortInput.value = "alfabetisch";
+            }
+            else if (selectObj.id == "sortViews") {
+                sortInput.value = "meesteviews";
+            }
+            document.getElementById("formResetPagina").submit();
+        }
+
+        function sendGet() {
+            var likedval = document.getElementById("likeCheck").checked;
+            var closedval = document.getElementById("geslotenCheck").checked;
+            var fromval = document.getElementById("fromDate").value;
+            var toval = document.getElementById("toDate").value;
+            var zoekval = document.getElementById("zoektext").value;
+            document.getElementById("likedInputReset").value = likedval;
+            document.getElementById("closedInputReset").value = closedval;
+            document.getElementById("fromInputReset").value = fromval;
+            document.getElementById("toInputReset").value = toval;
+            document.getElementById("zoekInputReset").value = zoekval;
+            document.getElementById("formResetPagina").submit();
+        }
+
+        function pagineer(selectObj) {
+            var val = selectObj.value;
+            var pageInput = document.getElementById('pageInput');
+            pageInput.value = val;
+            document.getElementById('formPagina').submit();
+        }
+    </script>
+}

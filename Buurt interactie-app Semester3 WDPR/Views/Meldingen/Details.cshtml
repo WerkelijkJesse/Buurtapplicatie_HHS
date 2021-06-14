@@ -1,0 +1,164 @@
+@using Microsoft.AspNetCore.Identity
+@using Buurt_interactie_app_Semester3_WDPR.Areas.Identity.Data
+@inject UserManager<BuurtAppUser> UserManager
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+@model Buurt_interactie_app_Semester3_WDPR.Models.Melding
+@{
+    ViewData["Title"] = "Melding";
+}
+<div id="pag-title"><h3>Melding details</h3></div>
+
+<link rel="stylesheet" href="/css/Details.css" />
+<div id="content" class="row justify-content-between">
+    <div id="details" class="col-lg-6 px-0">
+        <div id="melding-header" class="border">
+            <div id="melding-titel" class="py-3 px-2 border" style="overflow-wrap: break-word"><span><h3>@Html.DisplayFor(model => model.Titel)</h3></span></div>
+            <div id="melding-data" class="row nomargin py-2 border">
+                <div id="melding-categorie" class="col-6">
+                    <span><strong>Categorie: </strong>@Html.DisplayFor(model => model.CategorieNaam)<br /> <strong>Door: </strong>@Html.DisplayFor(model => model.Buurtbewoner.Naam)</span>
+                </div>
+                <div id="melding-timedate" class="col-6 text-right">
+                    <span class="align-self-end"> @Model.Tijdstip.ToShortTimeString()<br />@Model.Tijdstip.Date.ToShortDateString()</span>
+                </div>
+            </div>
+        </div>
+        <div id="melding-body" class="row nomargin border">
+            <div id="melding-content" class="col-12 py-2" style="overflow-wrap: break-word"><span>@Html.DisplayFor(model => model.Tekst)</span></div>
+            <div id="melding-afb" class="col-12 py-2">
+                @if (Model.AfbeeldingURL != null)
+                {
+                    <img class="img-responsive center-block" src="~/uploads/@Model.AfbeeldingURL" alt="Melding afbeelding" />
+                }
+            </div>
+        </div>
+        <div id="melding-buttons" class="row nomargin justify-content-between py-2 px-2 border">
+            <button type="button" class="btn btn-primary" onclick="like();"><div id="LikeButton">@Model.Likes.Count()</div> Likes</button>
+            <button type="button" class="btn btn-outline-danger">Rapporteer</button>
+        </div>
+        <div>
+            <a asp-action="Index">Terug naar overzicht</a>
+            @if ((await UserManager.GetUserAsync(User)).Id == Model.BuurtbewonerId)
+            {
+                <span> | </span>
+                <a asp-action="Edit" asp-route-id="@Model.Id">Bewerk</a>
+            }
+        </div>
+    </div>
+    <div id="reacties" class="col-lg-5 px-1">
+        <div id="reactie-header" class="py-2"><span><h3 id="aantalreacties">Reacties (@Model.Reacties.Count())</h3></span></div>
+        <div id="reactie-container" class="row">
+            @foreach (var react in Model.Reacties)
+            {
+                <div class="py-2 px-2 col-10">
+                    <div id="reactie-auteur"><strong>@react.Buurtbewoner.Naam</strong></div>
+                    <div id="reactie-content">@react.Tekst</div>
+                </div>
+                var user = await UserManager.GetUserAsync(User);
+                var roles = await UserManager.GetRolesAsync(user);
+                if (react.BuurtbewonerId == user.Id || roles.Contains("Moderator") || roles.Contains("Administrator"))
+                {
+                    <div class="col-2">
+                        <a class="btn btn-outline-danger" onclick="delReactie(this);" id="@react.Id">Verwijder</a>
+                    </div>
+                }
+            }
+
+        </div>
+        <div id="reactie-input" class="align-bottom row nomargin">
+
+            <form class="col-9 px-0">
+                <textarea class="form-control" id="reactietext" rows="3" placeholder="Reageer..."></textarea>
+            </form>
+
+            <div id="reactie-button" class="col-3 px-2"><button type="submit" class="btn-outline-dark btn" onclick="reageer()">Plaats</button></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+
+    function delReactie(selObj) {
+        fetch('/Meldingen/DeleteReactie/' + selObj.id, {
+            method: 'POST',
+            headers: { "RequestVerificationToken": "@GetAntiXsrfRequestToken()"},
+        })
+            .then(r => {
+                if (!r.ok) { throw r }
+                window.location.reload();
+            });
+        }
+
+    function like() {
+        var likeInfo = { "MeldingId": @Model.Id, "BuurtbewonerId": "@UserManager.GetUserId(User)" };
+        fetch('@(Url.Action("LikeMelding","Meldingen"))/' + @Model.Id, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "RequestVerificationToken": "@GetAntiXsrfRequestToken()"},
+            body: JSON.stringify(likeInfo),
+
+        })
+            .then(r => {
+                if (!r.ok) { throw r }
+                r.json()
+            })
+            .then(r => {
+                    document.getElementById('LikeButton').innerHTML = @Model.Likes.Count()+1;
+            });
+
+    }
+
+    function reageer() {
+        var reactieInfo = { "MeldingId": @Model.Id, "BuurtbewonerId": "@UserManager.GetUserId(User)", "Tekst": document.getElementById('reactietext').value };
+        fetch('/Meldingen/ReageerMelding/' + @Model.Id, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                "RequestVerificationToken": "@GetAntiXsrfRequestToken()"},
+            body: JSON.stringify(reactieInfo)
+        })
+            .then(r => r.json())
+            .then(r => {
+                var reactieDiv = document.createElement("div");
+                var auteurDiv = document.createElement("div");
+                auteurDiv.innerHTML = "<strong>" + "@((await UserManager.FindByIdAsync(UserManager.GetUserId(User))).Naam)" + "</strong>";
+                var tekstDiv = document.createElement("div");
+                tekstDiv.innerHTML = r.tekst;
+                reactieDiv.appendChild(auteurDiv);
+                reactieDiv.appendChild(tekstDiv);
+                var reactieContainer = document.getElementById('reactie-container');
+                reactieContainer.appendChild(reactieDiv);
+                document.getElementById('reactietext').innerHTML = "";
+                reactieDiv.classList.add("px-2", "py-2", "col-10");
+                var buttonDiv = document.createElement("div");
+                buttonDiv.classList.add("col-2");
+                var deleteButton = document.createElement("a");
+                deleteButton.classList.add("btn", "btn-outline-danger");
+                deleteButton.onclick = function () {
+                    fetch('/Meldingen/DeleteReactie/' + selObj.id, {
+                    method: 'POST',
+                    headers: { "RequestVerificationToken": "@GetAntiXsrfRequestToken()"},
+                })
+                    .then(r => {
+                        if (!r.ok) { throw r }
+                        window.location.reload();
+                    });
+                }
+                deleteButton.id = r.id;
+                deleteButton.innerText = "Verwijder";
+                buttonDiv.appendChild(deleteButton);
+                reactieContainer.appendChild(buttonDiv);
+                window.location.reload();
+                    });
+
+    }
+    </script>
+}

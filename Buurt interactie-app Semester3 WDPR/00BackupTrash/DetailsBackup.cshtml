@@ -1,0 +1,113 @@
+﻿@model Buurt_interactie_app_Semester3_WDPR.Models.Melding
+
+@{
+    ViewData["Title"] = "Melding";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Melding</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Titel)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Titel)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Tekst)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Tekst)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Afbeelding)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Afbeelding)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Buurtbewoner)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Buurtbewoner.Naam)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BuurtbewonerId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.BuurtbewonerId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Tijdstip)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Tijdstip)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Categorie)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Categorie.Naam)
+        </dd>
+
+        <dt class="col-sm-2">
+
+            @Html.DisplayNameFor(model => model.Open)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Open)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Likes)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Likes.Count)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AantalViews)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AantalViews.Count)
+        </dd>
+    </dl>
+</div>
+<div id="reacties">
+
+</div>
+
+
+@section Scripts {
+
+    <script>
+        function getReacties() {
+            fetch('/Meldingen/GetReacties/' +  @Model.Id)
+                .then((response) => response.json())
+                .then((reacties) => {
+                    console.log(reacties);
+                    if (reacties === undefined || reacties.length == 0) {
+                        var aantaldiv = document.createElement("div").appendChild(document.createTextNode("0 Reacties"));
+                        document.getElementById("reacties").appendChild(aantaldiv);
+                        }
+                        else {
+                            var aantaldiv = document.createElement("div").appendChild(document.createTextNode(reacties.length + " Reacties"));
+                            document.getElementById("reacties").appendChild(aantaldiv);
+                            for (let r of reacties) {
+                                var div = document.createElement("div");
+                                var name = document.createElement("div").appendChild(document.createTextNode(r.buurtbewoner.naam));
+                                name.className = "font-weight-bold";
+                                var tekst = document.createElement("div").appendChild(document.createTextNode(r.tekst));
+                                div.appendChild(name);
+                                div.appendChild(tekst);
+                                document.getElementById("reacties").appendChild(div);
+                            }
+                        }
+
+                })
+                .then(r => console.log(r));
+        }
+        getReacties();
+    </script>
+}
